@@ -6,4 +6,5 @@ dist
 .DS_Store
 .dev-screenshot-*.png
 .playwright-mcp
+.memory
 *.log
