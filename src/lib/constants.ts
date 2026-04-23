@@ -12,7 +12,7 @@ export const ASSETS = {
   sceneDoneSquare: "/brand/scenes/obdx-scene-done-square.png",
 
   wrench: "/brand/ip/wrench/default.png",
-  wrenchUncle: "/brand/ip/wrench-uncle/default.png",
+  wrenchUncle: "/brand/ip/wrench-uncle/default.jpg",
   wrenchUncleWithDash: "/brand/ip/wrench-uncle/with-dash.png",
   dash: "/brand/ip/dash/default.png",
 } as const;

@@ -173,10 +173,11 @@ export default function Hero() {
 
         {/* Feature preview bento row */}
         <motion.div
+          id="features"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="md:col-span-6 rounded-[28px] bg-[#FAFAF7] border border-black/5 p-6 md:p-7 min-h-[200px] flex flex-col justify-between"
+          className="md:col-span-6 rounded-[28px] bg-[#FAFAF7] border border-black/5 p-6 md:p-7 min-h-[200px] flex flex-col justify-between scroll-mt-6"
         >
           <div className="flex items-center gap-2 text-xs font-mono text-[#1A1A1A]/40 tracking-wider">
             <Gauge size={13} />
