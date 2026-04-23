@@ -5,76 +5,100 @@ import {
   Car,
   Clock,
   Sparkles,
+  Database,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import {
+  DTC_FIXTURES,
+  DTC_DB_TOTAL,
+  formatCostRange,
+} from "@/lib/dtc-fixtures";
 
-const CASES = [
+/**
+ * Tier 1 (DB) fields — code, title, cost, labor — come from dtc-fixtures
+ * (synced from backend/src/dtc_data.py). Narrative fields (vehicle, plain
+ * English, drivable, action) are Tier 3 (what AI would generate at runtime)
+ * and hardcoded here until the AI Key is wired up.
+ */
+const SCENARIOS: Record<
+  keyof typeof DTC_FIXTURES,
   {
-    dtc: "P0420",
-    title: "Catalytic Converter Efficiency",
+    vehicle: string;
+    mileage: string;
+    plainEnglish: string;
+    severity: string;
+    severityColor: string;
+    drivable: string;
+    action: string;
+  }
+> = {
+  P0420: {
     vehicle: "2018 Honda Civic 1.5L Turbo",
     mileage: "108,432 mi",
     plainEnglish:
       "Your catalytic converter is past its prime. Not urgent — you have 1–2 weeks — but past 80k miles on this engine it's almost expected.",
     severity: "Plan within 2 weeks",
     severityColor: "#F59E0B",
-    cost: "$400 – $650",
     drivable: "Yes, safely 1–2 weeks",
     action: "Independent mechanic is fine — no dealer needed.",
   },
-  {
-    dtc: "P0301",
-    title: "Cylinder 1 Misfire",
+  P0301: {
     vehicle: "2020 Toyota Camry 2.5L",
     mileage: "64,100 mi",
     plainEnglish:
       "One of your 4 cylinders is firing inconsistently. Usually a spark plug or ignition coil on cylinder 1. Cheap to rule out before assuming anything bigger.",
     severity: "Easy fix",
     severityColor: "#10B981",
-    cost: "$80 – $200",
     drivable: "Drive gently until fixed",
-    action: "Start with a $30 plug + 30 min labor. If it comes back, swap the coil.",
+    action:
+      "Start with a $30 plug + 30 min labor. If it comes back, swap the coil.",
   },
-  {
-    dtc: "P0171",
-    title: "Lean Fuel Condition (Bank 1)",
+  P0171: {
     vehicle: "2015 Ford F-150 5.0L V8",
     mileage: "108,204 mi",
     plainEnglish:
       "Engine is getting too much air or not enough fuel. Usually a vacuum leak, dirty MAF sensor, or weak fuel pump — in that order of likelihood.",
-    severity: "Easy fix",
-    severityColor: "#10B981",
-    cost: "$80 – $220",
+    severity: "Service soon",
+    severityColor: "#F59E0B",
     drivable: "Yes, but expect worse MPG",
     action: "Smoke test for a vacuum leak first (~$30 at any shop).",
   },
-  {
-    dtc: "P0442",
-    title: "EVAP System Small Leak",
+  P0442: {
     vehicle: "2019 Chevy Equinox 1.5L",
     mileage: "72,800 mi",
     plainEnglish:
       "A small leak somewhere in your fuel vapor recovery system. 9 times out of 10 it's the gas cap — check whether it clicks when you tighten it.",
     severity: "Easy fix",
     severityColor: "#10B981",
-    cost: "$5 – $120",
     drivable: "Yes, completely safe",
     action: "Swap the gas cap first ($5). If it returns, check the purge hose.",
   },
-  {
-    dtc: "P0700",
-    title: "Transmission Control System Fault",
+  P0700: {
     vehicle: "2017 Jeep Grand Cherokee 3.6L",
     mileage: "94,100 mi",
     plainEnglish:
       "Your transmission computer detected an internal fault. P0700 is only the trigger — the specific P07xx code it stored alongside is what you actually need to read next.",
     severity: "Urgent — diagnose now",
     severityColor: "#EF4444",
-    cost: "$100 diag – $3,500 rebuild",
     drivable: "Drive to a shop, not daily",
-    action: "Don't DIY. Dealer or a transmission specialist. Fluid change first if never serviced.",
+    action:
+      "Don't DIY. Dealer or a transmission specialist. Fluid change first if never serviced.",
   },
-];
+};
+
+const CASES = (Object.keys(SCENARIOS) as Array<keyof typeof DTC_FIXTURES>).map(
+  (code) => {
+    const db = DTC_FIXTURES[code];
+    const s = SCENARIOS[code];
+    return {
+      dtc: db.code,
+      title: db.description_en,
+      cost: formatCostRange(db.estimated_cost_min, db.estimated_cost_max),
+      laborHours: db.labor_hours,
+      ...s,
+    };
+  },
+);
 
 const AUTO_INTERVAL_MS = 6000;
 
@@ -132,6 +156,13 @@ export default function DTCCarousel() {
         <p className="mt-4 text-base md:text-lg text-[#1A1A1A]/60 max-w-2xl mx-auto">
           Type a DTC into OBDX. Here's exactly what you'd get back.
         </p>
+        <div className="mt-4 inline-flex items-center gap-2 text-[11px] font-mono text-[#1A1A1A]/45">
+          <Database size={12} />
+          Costs + diagnostic steps pulled from a live{" "}
+          <span className="font-semibold text-[#1A1A1A]/70">
+            {DTC_DB_TOTAL}-record OBD-II database
+          </span>
+        </div>
       </motion.div>
 
       {/* Carousel container */}

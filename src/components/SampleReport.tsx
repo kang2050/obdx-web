@@ -20,8 +20,82 @@ import {
   Info,
 } from "lucide-react";
 import { useState } from "react";
+import { DTC_FIXTURES, DTC_DB_TOTAL, formatCostRange } from "@/lib/dtc-fixtures";
 
 type ViewMode = "easy" | "pro";
+
+/**
+ * Merge Tier 1 (real DB, from backend/dtc_data.py) with Tier 2/3 (narrative
+ * that AI + CHARM would normally generate at runtime but are hardcoded here
+ * for the demo until AI Key lands).
+ */
+function makeFault(
+  code: keyof typeof DTC_FIXTURES,
+  narrative: {
+    categoryLabel: string;
+    severityColor: string;
+    urgency: string;
+    simple: string;
+    technical: string;
+    whenMonitored: string;
+    setCondition: string;
+    charmSourced: boolean;
+  },
+) {
+  const db = DTC_FIXTURES[code];
+  return {
+    code: db.code,
+    title: db.description_en,
+    causes: db.common_causes,
+    steps: db.diagnostic_steps,
+    cost: { min: db.estimated_cost_min, max: db.estimated_cost_max },
+    laborHours: db.labor_hours,
+    ...narrative,
+  };
+}
+
+const FAULTS = [
+  makeFault("P0420", {
+    categoryLabel: "Emission",
+    severityColor: "#F59E0B",
+    urgency: "Plan within 2 weeks",
+    simple:
+      "Your catalytic converter is past its prime. Not urgent — you have 1–2 weeks — but past 80k miles on this engine it's almost expected.",
+    technical:
+      "Downstream O₂ sensor waveform is mimicking the upstream sensor's cycling pattern, indicating the cat is no longer storing and releasing enough oxygen to convert emissions efficiently. On 2016–2018 Civics with the 1.5L Turbo past 80k miles this is very common due to the engine's known oil-burn tendency.",
+    whenMonitored: "Warm engine, steady 1500–3000 RPM cruise",
+    setCondition:
+      "Downstream O₂ activity > 60% of upstream over 2 drive cycles",
+    charmSourced: true,
+  }),
+  makeFault("P0171", {
+    categoryLabel: "Fuel Metering",
+    severityColor: "#F59E0B",
+    urgency: "Service soon",
+    simple:
+      "Your engine is getting too much air or not enough fuel. Cheap to diagnose. On this platform it's almost always a vacuum leak.",
+    technical:
+      "LTFT is +12.5% on Bank 1 (past the +10% threshold). Combined with STFT +8.2%, the ECU is consistently commanding more fuel to compensate. On the 1.5L Turbo the most common cause is a cracked PCV hose or carbon-clogged MAF sensor.",
+    whenMonitored: "Warm engine, closed-loop cruising",
+    setCondition: "LTFT > +10% on Bank 1 over 2 drive cycles",
+    charmSourced: true,
+  }),
+  makeFault("P0442", {
+    categoryLabel: "Emission",
+    severityColor: "#10B981",
+    urgency: "Easy fix",
+    simple:
+      "Small leak somewhere in your fuel vapor system. 9 out of 10 times it's the gas cap — check whether it clicks when you tighten it.",
+    technical:
+      "EVAP leak detected > 0.020-inch orifice equivalent. No driveability impact — emissions only. Gas cap seal is the statistically dominant failure mode on Hondas.",
+    whenMonitored: "Cold start EVAP self-test",
+    setCondition: "Pressure decay > spec during timed test",
+    charmSourced: false,
+  }),
+];
+
+const totalMin = FAULTS.reduce((s, f) => s + f.cost.min, 0);
+const totalMax = FAULTS.reduce((s, f) => s + f.cost.max, 0);
 
 const SAMPLE = {
   vehicle: {
@@ -52,100 +126,8 @@ const SAMPLE = {
     ],
   },
   aiSummary:
-    "Your Civic is in solid shape for 108k miles. The catalytic converter is degrading — not urgent, but past 80k on this engine it's almost expected. The lean fuel condition is likely related and cheap to fix. The EVAP code is almost certainly the gas cap. Fix the lean condition first ($80–220), drive 2 weeks, then re-test the cat. You may save $400–650.",
-  faults: [
-    {
-      code: "P0420",
-      title: "Catalyst System Efficiency Below Threshold (Bank 1)",
-      category: "Emission",
-      severity: "medium",
-      severityColor: "#F59E0B",
-      urgency: "Plan within 2 weeks",
-      simple:
-        "Your catalytic converter is past its prime. Not urgent — you have 1–2 weeks — but past 80k miles on this engine it's almost expected.",
-      technical:
-        "Downstream O₂ sensor waveform is mimicking the upstream sensor's cycling pattern, indicating the cat is no longer storing and releasing enough oxygen to convert emissions efficiently. On 2016–2018 Civics with the 1.5L Turbo past 80k miles this is very common due to the engine's known oil-burn tendency.",
-      causes: [
-        { cause: "Aged/failed catalytic converter", probability: 40 },
-        { cause: "Faulty upstream O₂ sensor (mixture issue)", probability: 20 },
-        { cause: "Faulty downstream O₂ sensor (false reading)", probability: 15 },
-        { cause: "Exhaust leak before downstream O₂", probability: 15 },
-        { cause: "Engine oil consumption fouling cat", probability: 10 },
-      ],
-      steps: [
-        "Compare upstream and downstream O₂ waveforms at 2500 RPM",
-        "Measure cat inlet/outlet temperature delta (should be +50°F min)",
-        "Smoke test exhaust for leaks upstream of downstream sensor",
-        "Check oil consumption rate over 1,000 miles",
-        "Replace catalytic converter if above confirm failure",
-      ],
-      whenMonitored: "Warm engine, steady 1500–3000 RPM cruise",
-      setCondition: "Downstream O₂ activity > 60% of upstream over 2 drive cycles",
-      cost: { min: 400, max: 650 },
-      laborHours: 1.5,
-      charmSourced: true,
-    },
-    {
-      code: "P0171",
-      title: "Fuel System Too Lean (Bank 1)",
-      category: "Fuel Metering",
-      severity: "medium",
-      severityColor: "#F59E0B",
-      urgency: "Service soon",
-      simple:
-        "Your engine is getting too much air or not enough fuel. Cheap to diagnose. On this platform it's almost always a vacuum leak.",
-      technical:
-        "LTFT is +12.5% on Bank 1 (past the +10% threshold). Combined with STFT +8.2%, the ECU is consistently commanding more fuel to compensate. On the 1.5L Turbo the most common cause is a cracked PCV hose or carbon-clogged MAF sensor.",
-      causes: [
-        { cause: "Vacuum leak in intake system", probability: 40 },
-        { cause: "Dirty or faulty MAF sensor", probability: 25 },
-        { cause: "Insufficient fuel pump pressure", probability: 15 },
-        { cause: "Clogged or leaking fuel injector", probability: 10 },
-        { cause: "Faulty O₂ sensor", probability: 10 },
-      ],
-      steps: [
-        "Inspect intake duct and PCV hose for cracks",
-        "Check MAF sensor reading against spec (3–6 g/s at idle)",
-        "Test fuel pressure (should be 50–58 PSI)",
-        "Smoke test intake system for vacuum leaks",
-        "Inspect injector spray pattern if all above OK",
-      ],
-      whenMonitored: "Warm engine, closed-loop cruising",
-      setCondition: "LTFT > +10% on Bank 1 over 2 drive cycles",
-      cost: { min: 80, max: 220 },
-      laborHours: 1.0,
-      charmSourced: true,
-    },
-    {
-      code: "P0442",
-      title: "EVAP System Small Leak Detected",
-      category: "Emission",
-      severity: "low",
-      severityColor: "#10B981",
-      urgency: "Easy fix",
-      simple:
-        "Small leak somewhere in your fuel vapor system. 9 out of 10 times it's the gas cap — check whether it clicks when you tighten it.",
-      technical:
-        "EVAP leak detected > 0.020-inch orifice equivalent. No driveability impact — emissions only. Gas cap seal is the statistically dominant failure mode on Hondas.",
-      causes: [
-        { cause: "Worn fuel cap seal", probability: 40 },
-        { cause: "Hairline crack in EVAP hose", probability: 25 },
-        { cause: "EVAP canister port leak", probability: 20 },
-        { cause: "Fuel tank port leak", probability: 15 },
-      ],
-      steps: [
-        "Replace fuel cap first ($5) and drive 2 cycles",
-        "If code returns, smoke test EVAP system",
-        "Inspect EVAP hose fittings at canister and tank",
-        "Check EVAP canister and purge valve",
-      ],
-      whenMonitored: "Cold start EVAP self-test",
-      setCondition: "Pressure decay > spec during timed test",
-      cost: { min: 10, max: 120 },
-      laborHours: 0.5,
-      charmSourced: false,
-    },
-  ],
+    "Your Civic is in solid shape for 108k miles. The catalytic converter is degrading — not urgent, but past 80k on this engine it's almost expected. The lean fuel condition is likely related and cheap to fix. The EVAP code is almost certainly the gas cap. Fix the lean condition first ($30–300), drive 2 weeks, then re-test the cat. You may save $200–1,500.",
+  faults: FAULTS,
   freezeFrame: [
     { label: "Engine RPM", value: "1,420", unit: "rpm", ok: true },
     { label: "Engine Load", value: "34", unit: "%", ok: true },
@@ -171,8 +153,8 @@ const SAMPLE = {
     { name: "EGR System", status: "notReady" },
   ] as const,
   correlation:
-    "P0171 and P0420 are likely linked — running lean over time has accelerated catalyst degradation by causing incomplete combustion and higher-than-spec exhaust temperatures. Recommended order: fix the lean condition first (~$80–220), drive 2 weeks, then re-test catalyst efficiency. If P0420 clears on its own, you save $400–650.",
-  totalCost: { min: 490, max: 990 },
+    "P0171 and P0420 are likely linked — running lean over time has accelerated catalyst degradation by causing incomplete combustion and higher-than-spec exhaust temperatures. Recommended order: fix the lean condition first (~$30–300), drive 2 weeks, then re-test catalyst efficiency. If P0420 clears on its own, you save $200–1,500.",
+  totalCost: { min: totalMin, max: totalMax },
 } as const;
 
 function StatusDot({ status }: { status: string }) {
@@ -208,6 +190,17 @@ export default function SampleReport() {
           A complete AI repair report — exactly what shows up on your phone
           after a 10-second scan. Simple view for you. Pro view for your mechanic.
         </p>
+
+        {/* Data provenance badge */}
+        <div className="mt-5 inline-flex items-center gap-2 text-[11px] font-mono text-[#1A1A1A]/45">
+          <Database size={12} />
+          Causes, diagnostic steps & cost ranges below are sourced from the
+          live{" "}
+          <span className="font-semibold text-[#1A1A1A]/70">
+            {DTC_DB_TOTAL}-record OBD-II database
+          </span>{" "}
+          — not mockup data.
+        </div>
 
         {/* View toggle */}
         <div className="mt-7 inline-flex items-center p-1 rounded-full bg-[#F5F1EA] border border-black/5">
@@ -333,13 +326,13 @@ export default function SampleReport() {
             <div className="text-3xl md:text-4xl font-extrabold tabular-nums mt-1">
               ${SAMPLE.totalCost.min}{" "}
               <span className="text-white/30 font-bold">–</span> $
-              {SAMPLE.totalCost.max}
+              {SAMPLE.totalCost.max.toLocaleString()}
             </div>
-            {mode === "pro" && (
-              <div className="text-xs font-mono text-white/40 mt-1">
-                based on priority-ordered fix plan (see correlation)
-              </div>
-            )}
+            <div className="text-xs font-mono text-white/40 mt-1">
+              {mode === "pro"
+                ? "summed from 3 DTC records in the reference database"
+                : "real database cost ranges, 3 issues combined"}
+            </div>
           </div>
           <div className="flex flex-wrap gap-3">
             <a
@@ -439,7 +432,7 @@ function EasyView() {
               </div>
               <div className="md:text-right shrink-0 flex md:flex-col items-center md:items-end gap-3 md:gap-1">
                 <div className="text-sm md:text-base font-bold text-[#1A1A1A] tabular-nums">
-                  ${f.cost.min}–${f.cost.max}
+                  {formatCostRange(f.cost.min, f.cost.max)}
                 </div>
                 <div
                   className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
@@ -531,10 +524,16 @@ function ProView() {
                   </div>
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#1A1A1A]/5 text-[#1A1A1A]/55">
-                      {f.category}
+                      {f.categoryLabel}
                     </span>
                     <span className="text-[10px] font-mono text-[#1A1A1A]/35">
                       LABOR {f.laborHours}h
+                    </span>
+                    <span
+                      className="inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#10B981]/10 text-[#10B981]"
+                      title={`Sourced from ${DTC_DB_TOTAL}-record OBD-II DB`}
+                    >
+                      DB REF ✓
                     </span>
                     {f.charmSourced && (
                       <span className="inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#E07856]/10 text-[#E07856]">
@@ -546,7 +545,7 @@ function ProView() {
               </div>
               <div className="flex flex-col items-end gap-1">
                 <div className="text-lg md:text-xl font-bold text-[#1A1A1A] tabular-nums">
-                  ${f.cost.min}–${f.cost.max}
+                  {formatCostRange(f.cost.min, f.cost.max)}
                 </div>
                 <span
                   className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
@@ -573,8 +572,13 @@ function ProView() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Causes with probability */}
               <div>
-                <div className="text-[10px] font-mono text-[#1A1A1A]/40 tracking-widest mb-3">
-                  PROBABLE CAUSES
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-mono text-[#1A1A1A]/40 tracking-widest">
+                    PROBABLE CAUSES
+                  </span>
+                  <span className="text-[9px] font-mono text-[#10B981]/60">
+                    DB
+                  </span>
                 </div>
                 <ul className="space-y-2.5">
                   {f.causes.map((c, i) => (
@@ -607,8 +611,13 @@ function ProView() {
 
               {/* Diagnostic steps */}
               <div>
-                <div className="text-[10px] font-mono text-[#1A1A1A]/40 tracking-widest mb-3">
-                  DIAGNOSTIC STEPS
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-mono text-[#1A1A1A]/40 tracking-widest">
+                    DIAGNOSTIC STEPS
+                  </span>
+                  <span className="text-[9px] font-mono text-[#10B981]/60">
+                    DB
+                  </span>
                 </div>
                 <ol className="space-y-2">
                   {f.steps.map((s, i) => (
@@ -746,10 +755,13 @@ function ProView() {
       <div className="rounded-[24px] bg-white border border-black/5 p-4 md:p-5 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono text-[#1A1A1A]/40">
         <div className="flex items-center gap-4 flex-wrap">
           <span className="flex items-center gap-1.5">
-            <Database size={12} /> 706 GB CHARM
+            <Database size={12} /> {DTC_DB_TOTAL}-record DTC DB
           </span>
           <span className="flex items-center gap-1.5">
             <Sparkles size={12} /> {SAMPLE.meta.aiModel}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Database size={12} /> 706 GB CHARM
           </span>
           <span className="flex items-center gap-1.5">
             <Zap size={12} /> {SAMPLE.meta.analysisSeconds}s ·{" "}
