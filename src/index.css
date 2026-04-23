@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  /* Bento Garage palette */
+  --color-bg-warm: #f5f1ea;
+  --color-bg-cream: #fafaf7;
+  --color-cobalt: #2563eb;
+  --color-terracotta: #e07856;
+  --color-ink: #1a1a1a;
+  --color-amber: #f59e0b;
+  --color-emerald: #10b981;
+  --color-slate: #64748b;
+
+  --font-family-heading: "Outfit", sans-serif;
+  --font-family-body: "DM Sans", sans-serif;
+  --font-family-mono: "JetBrains Mono", monospace;
+}
+
+body {
+  font-family: var(--font-family-body);
+  background: var(--color-bg-warm);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-heading);
+  letter-spacing: -0.02em;
+}
+
+.font-mono {
+  font-family: var(--font-family-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+}

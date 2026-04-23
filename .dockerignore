@@ -1,0 +1,8 @@
+node_modules
+dist
+.dev-screenshot-*.png
+.playwright-mcp
+.env
+.env.*
+.DS_Store
+*.log

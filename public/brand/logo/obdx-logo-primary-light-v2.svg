@@ -1,0 +1,54 @@
+<svg width="1600" height="480" viewBox="0 0 1600 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="signalPortFill" x1="84" y1="96" x2="420" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="0.58" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#4338CA"/>
+    </linearGradient>
+    <linearGradient id="signalPortGlow" x1="164" y1="160" x2="356" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="markX" x1="0" y1="0" x2="276" y2="276" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0F172A"/>
+      <stop offset="0.22" stop-color="#2563EB"/>
+      <stop offset="0.55" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#4338CA"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="480" fill="#F8FAFC" fill-opacity="0"/>
+
+  <g transform="translate(28 0)">
+    <path
+      d="M158 92H354C404 92 444 132 444 182V250C444 292 416 328 376 340L344 350V410C344 444 316 472 282 472H230C196 472 168 444 168 410V350L136 340C96 328 68 292 68 250V182C68 132 108 92 158 92ZM150 170C118 170 92 196 92 228C92 260 118 286 150 286H362C394 286 420 260 420 228C420 196 394 170 362 170H150Z"
+      fill="url(#signalPortFill)"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+    />
+    <path
+      d="M174 122H338C379 122 412 155 412 196V216C412 175 379 142 338 142H174C133 142 100 175 100 216V196C100 155 133 122 174 122Z"
+      fill="url(#signalPortGlow)"
+    />
+    <circle cx="256" cy="228" r="46" fill="#F59E0B"/>
+    <circle cx="256" cy="228" r="18" fill="#0F172A"/>
+    <circle cx="242" cy="212" r="8" fill="#F8FAFC" fill-opacity="0.9"/>
+    <path d="M178 392C178 379.85 187.85 370 200 370H216C228.15 370 238 379.85 238 392V420C238 432.15 228.15 442 216 442H200C187.85 442 178 432.15 178 420V392Z" fill="#0F172A" fill-opacity="0.92"/>
+    <path d="M234 384C234 371.85 243.85 362 256 362C268.15 362 278 371.85 278 384V428C278 440.15 268.15 450 256 450C243.85 450 234 440.15 234 428V384Z" fill="#F59E0B"/>
+    <path d="M274 392C274 379.85 283.85 370 296 370H312C324.15 370 334 379.85 334 392V420C334 432.15 324.15 442 312 442H296C283.85 442 274 432.15 274 420V392Z" fill="#0F172A" fill-opacity="0.92"/>
+  </g>
+
+  <text
+    x="560"
+    y="274"
+    fill="#0F172A"
+    font-family="Outfit, Avenir Next, Segoe UI, sans-serif"
+    font-size="206"
+    font-weight="800"
+    letter-spacing="-11"
+  >OBD</text>
+
+  <g transform="translate(1110 110)">
+    <path d="M0 0H58L136 96L214 0H272L166 130L278 276H220L136 172L52 276H0L108 130L0 0Z" fill="url(#markX)"/>
+  </g>
+</svg>
