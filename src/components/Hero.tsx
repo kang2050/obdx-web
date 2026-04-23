@@ -171,25 +171,24 @@ export default function Hero() {
           ))}
         </motion.div>
 
-        {/* Feature preview bento row */}
+        {/* Feature preview bento row — 4 cards */}
         <motion.div
           id="features"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="md:col-span-6 rounded-[28px] bg-[#FAFAF7] border border-black/5 p-6 md:p-7 min-h-[200px] flex flex-col justify-between scroll-mt-6"
+          className="md:col-span-3 rounded-[28px] bg-[#FAFAF7] border border-black/5 p-6 md:p-7 min-h-[200px] flex flex-col justify-between scroll-mt-6"
         >
-          <div className="flex items-center gap-2 text-xs font-mono text-[#1A1A1A]/40 tracking-wider">
+          <div className="flex items-center gap-2 text-[10px] font-mono text-[#1A1A1A]/40 tracking-widest">
             <Gauge size={13} />
             VEHICLE-SPECIFIC
           </div>
           <div>
-            <h3 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
-              Not generic code lookup.
+            <h3 className="text-xl md:text-2xl font-bold text-[#1A1A1A]">
+              Not generic lookup.
             </h3>
-            <p className="text-sm text-[#1A1A1A]/60 mt-2 max-w-sm">
-              OBDX knows your exact model &amp; engine variant. P0301 on a Civic
-              ≠ P0301 on an F-150.
+            <p className="text-xs md:text-sm text-[#1A1A1A]/60 mt-2">
+              P0301 on a Civic ≠ P0301 on an F-150. OBDX knows the difference.
             </p>
           </div>
         </motion.div>
@@ -198,18 +197,56 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
-          className="md:col-span-6 rounded-[28px] bg-[#2563EB] text-white p-6 md:p-7 min-h-[200px] flex flex-col justify-between relative overflow-hidden"
+          className="md:col-span-3 rounded-[28px] bg-[#2563EB] text-white p-6 md:p-7 min-h-[200px] flex flex-col justify-between relative overflow-hidden"
         >
-          <div className="flex items-center gap-2 text-xs font-mono text-white/60 tracking-wider">
+          <div className="flex items-center gap-2 text-[10px] font-mono text-white/60 tracking-widest">
             <Sparkles size={13} />
             PLAIN ENGLISH
           </div>
           <div className="relative z-10">
-            <h3 className="text-2xl md:text-3xl font-bold">
-              No jargon.
-              <br />
-              Just what's wrong &amp; how much.
+            <h3 className="text-xl md:text-2xl font-bold">
+              No jargon. Just what's wrong.
             </h3>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="md:col-span-3 rounded-[28px] bg-[#1A1A1A] text-white p-6 md:p-7 min-h-[200px] flex flex-col justify-between relative overflow-hidden"
+        >
+          <div className="flex items-center gap-2 text-[10px] font-mono text-white/40 tracking-widest">
+            <Sparkles size={13} />
+            NO APP
+          </div>
+          <div>
+            <h3 className="text-xl md:text-2xl font-bold">
+              Scan QR. Open browser. Done.
+            </h3>
+            <p className="text-xs md:text-sm text-white/55 mt-2">
+              No install, no login, no Play Store review queue.
+            </p>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.45 }}
+          className="md:col-span-3 rounded-[28px] bg-[#FAFAF7] border border-black/5 p-6 md:p-7 min-h-[200px] flex flex-col justify-between relative overflow-hidden"
+        >
+          <div className="flex items-center gap-2 text-[10px] font-mono text-[#1A1A1A]/40 tracking-widest">
+            <Gauge size={13} />
+            ANY SCANNER
+          </div>
+          <div>
+            <h3 className="text-xl md:text-2xl font-bold text-[#1A1A1A]">
+              $10 Bluetooth. $15 Wi-Fi.
+            </h3>
+            <p className="text-xs md:text-sm text-[#1A1A1A]/60 mt-2">
+              Any OBD-II from the last 5 years. No locked brand required.
+            </p>
           </div>
         </motion.div>
       </div>

@@ -6,16 +6,16 @@ const FOOTER_LINKS = {
     { label: "How it works", href: "#how" },
     { label: "Pricing", href: "#pricing" },
     { label: "Compare", href: "#compare" },
+    { label: "Sample report", href: "#sample" },
+    { label: "FAQ", href: "#faq" },
   ],
   Company: [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "Reviews", href: "#reviews" },
+    { label: "Contact", href: "mailto:hello@obdx.ai" },
   ],
   Legal: [
-    { label: "Privacy", href: "#" },
-    { label: "Terms", href: "#" },
-    { label: "Cookies", href: "#" },
+    { label: "Privacy", href: "mailto:hello@obdx.ai?subject=Privacy%20policy" },
+    { label: "Terms", href: "mailto:hello@obdx.ai?subject=Terms" },
   ],
 } as const;
 

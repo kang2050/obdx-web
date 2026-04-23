@@ -4,6 +4,8 @@ import Showcase from "@/components/Showcase";
 import SampleReport from "@/components/SampleReport";
 import Pricing from "@/components/Pricing";
 import Comparison from "@/components/Comparison";
+import Testimonials from "@/components/Testimonials";
+import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 
 export default function App() {
@@ -15,6 +17,8 @@ export default function App() {
       <SampleReport />
       <Pricing />
       <Comparison />
+      <Testimonials />
+      <FAQ />
       <Footer />
     </div>
   );
